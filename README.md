@@ -11,25 +11,27 @@ Originman使用教程：https://originman.guyuehome.com/zh/guide/quick_guide/#1
 
 
 使用方法：
-1、在orginman_hu/integrated_chat_node.py内将api_key改为自己的deepseek的key
+1、项目放如图目录所示<img width="357" height="816" alt="image" src="https://github.com/user-attachments/assets/9090d9b1-6e2e-436e-a13a-55fe0013d1b4" />
 
-2、继续在该文件内将以下语音程序配置改为自己机器人的音频配置  
+2、在orginman_hu/integrated_chat_node.py内将api_key改为自己的deepseek的key
+
+3、继续在该文件内将以下语音程序配置改为自己机器人的音频配置  
         # 本地语音合成配置
         self.audio_device = "plughw:0,0"
         
-3、用ssh将自己的机器人连接到自己范围内的wifi
+4、用ssh将自己的机器人连接到自己范围内的wifi
 sudo nmcli device wifi list          # 列出找到的wifi网络
 sudo wifi_connect "WiFi用户名" "WiFi密码"   # Linux连wifi
 
-4、
+5、
 ## 安装工具包
 ```shell
 pip install opencv-python jupyter notebook openai appbuilder-sdk qianfan cozepy boto3 anthropic
 ```
 
-5、直接运行integrated_chat_node.py,然后在命令行输入你要跟机器人交流的内容
+6、直接运行integrated_chat_node.py,然后在命令行输入你要跟机器人交流的内容
 
-6、有问题问AI,有问题问AI,有问题问AI!!我的也是ai帮我写好的
+7、有问题问AI,有问题问AI,有问题问AI!!我的也是ai帮我写好的
 
 
 ai提示词内容:
