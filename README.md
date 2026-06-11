@@ -32,6 +32,7 @@ pip install opencv-python jupyter notebook openai appbuilder-sdk qianfan cozepy 
 6、有问题问AI,有问题问AI,有问题问AI!!我的也是ai帮我写好的
 
 
+ai提示词内容:
 <img width="268" height="352" alt="image" src="https://github.com/user-attachments/assets/94dcd202-56cd-4e27-8bdf-f33a605cd4bd" />
 
 
