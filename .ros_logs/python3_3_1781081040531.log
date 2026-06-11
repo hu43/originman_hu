@@ -1,0 +1,10 @@
+[INFO] [1781081040.828458538] [integrated_robot_chat_node]: 集成交互节点已启动，支持命令行输入与语音识别输入。
+[INFO] [1781081040.831042921] [integrated_robot_chat_node]: 命令行输入 exit 或 quit 可退出节点。
+[INFO] [1781081040.836838189] [integrated_robot_chat_node]: 收到命令行输入: 命令行测试
+[INFO] [1781081040.837685442] [integrated_robot_chat_node]: 开始处理命令行输入: 命令行测试
+[INFO] [1781081040.840287409] [integrated_robot_chat_node]: 模型原始输出: {'action':['wave()'], 'response':'ok'}
+[INFO] [1781081040.842733500] [integrated_robot_chat_node]: 解析后的动作: ['wave()']
+[INFO] [1781081041.343317910] [integrated_robot_chat_node]: 开始处理语音输入: 语音测试
+[INFO] [1781081041.344807206] [integrated_robot_chat_node]: 收到语音输入: 语音测试
+[INFO] [1781081041.347070463] [integrated_robot_chat_node]: 模型原始输出: {'action':['wave()'], 'response':'ok'}
+[INFO] [1781081041.349719971] [integrated_robot_chat_node]: 解析后的动作: ['wave()']
