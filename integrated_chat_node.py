@@ -10,6 +10,8 @@ import threading
 import time
 import hiwonder.ActionGroupControl as AGC
 import subprocess
+import asyncio
+import edge_tts
 
 # 配置日志
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -95,7 +97,7 @@ class IntegratedChatNode(Node):
         super().__init__('integrated_chat_node')
         
         # DeepSeek 配置
-        self.api_key = "sk-be5df3aXXXXXXXXXXXXXXXXX"
+        self.api_key = "sk-be5df3a1dc7c4e6787ed02a92a805984"
         self.base_url = "https://api.deepseek.com/v1"
         self.model = "deepseek-chat"
         
@@ -232,31 +234,17 @@ class IntegratedChatNode(Node):
             self.get_logger().error(f"调用 DeepSeek API 失败: {e}")
 
     def _synthesize_and_play(self, text):
-        """使用 eSpeak 本地语音合成并播放"""
+        """使用 edge-tts 语音合成并播放"""
         if not text.strip():
             self.get_logger().info("无文本需要合成")
             return
         
         try:
-            # 使用 eSpeak 合成语音并直接播放
-            cmd = [
-                "espeak",
-                "-v", "zh",
-                "-a", "100",
-                "-s", "150",
-                "-w", "/dev/stdout",
-                text
-            ]
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            wav_data = loop.run_until_complete(self._edge_tts_synthesize(text))
+            loop.close()
             
-            # 生成 WAV 数据
-            result = subprocess.run(cmd, capture_output=True)
-            if result.returncode != 0:
-                self.get_logger().error(f"eSpeak 合成失败: {result.stderr.decode()}")
-                return
-            
-            wav_data = result.stdout
-            
-            # 播放音频
             if wav_data:
                 cmd = ["aplay", "-D", self.audio_device, "-"]
                 result = subprocess.run(cmd, input=wav_data)
@@ -267,6 +255,24 @@ class IntegratedChatNode(Node):
                 
         except Exception as e:
             self.get_logger().error(f"语音合成播放失败: {e}")
+    
+    async def _edge_tts_synthesize(self, text):
+        communicate = edge_tts.Communicate(text, "zh-CN-XiaoxiaoNeural")
+        mp3_data = bytearray()
+        async for chunk in communicate.stream():
+            if chunk["type"] == "audio":
+                mp3_data.extend(chunk["data"])
+        
+        # 使用 ffmpeg 将 MP3 转换为 WAV
+        result = subprocess.run(
+            ["ffmpeg", "-i", "pipe:0", "-f", "wav", "-acodec", "pcm_s16le", "-ar", "24000", "pipe:1"],
+            input=bytes(mp3_data),
+            capture_output=True
+        )
+        if result.returncode != 0:
+            self.get_logger().error(f"ffmpeg 转换失败: {result.stderr.decode()}")
+            return b""
+        return result.stdout
 
 def main(args=None):
     rclpy.init(args=args)
