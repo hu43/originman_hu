@@ -76,7 +76,7 @@ def turn_left(): AGC.runActionGroup('turn_left')
 def turn_right(): AGC.runActionGroup('turn_right')
 def bow(): AGC.runActionGroup('bow')
 def wave(): AGC.runActionGroup('wave')
-def twist(): AGC.runActionGroup('twist')
+def twist(): AGC.runActiionGroup('twist')
 def celebrate(): AGC.runActionGroup('chest')
 def squat(): AGC.runActionGroup('squat')
 def right_shot(): AGC.runActionGroup('right_shot_fast')
@@ -86,11 +86,11 @@ def stepping(): AGC.runActionGroup('stepping')
 def wing_chun(): AGC.runActionGroup('wing_chun')
 def stand_up_front(): AGC.runActionGroup('stand_up_front')
 def stand_up_back(): AGC.runActionGroup('stand_up_back')
-def athletics(): os.system('python3 /userdata/dev_ws/src/originman/orginman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/athletics_perform_only.py')
-def kickball(color='red'): os.system(f'python3 /userdata/dev_ws/src/originman/orginman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/KickBall_only_once.py {color}')
+def athletics(): os.system('python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/athletics_perform_only.py')
+def kickball(color='red'): os.system(f'python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/KickBall_only_once.py {color}')
 def transport(color_list_str='red green blue'):
     color_list = color_list_str.split(' ')
-    os.system(f'python3 /userdata/dev_ws/src/originman/orginman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/Transport_only.py "{color_list}"')
+    os.system(f'python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/Transport_only.py "{color_list}"')
 
 class IntegratedChatNode(Node):
     def __init__(self):
@@ -257,7 +257,7 @@ class IntegratedChatNode(Node):
             self.get_logger().error(f"语音合成播放失败: {e}")
     
     async def _edge_tts_synthesize(self, text):
-        communicate = edge_tts.Communicate(text, "zh-CN-XiaoxiaoNeural")
+        communicate = edge_tts.Communicate(text, "zh-CN-XiaoyiNeural")
         mp3_data = bytearray()
         async for chunk in communicate.stream():
             if chunk["type"] == "audio":
