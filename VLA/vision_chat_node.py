@@ -75,6 +75,9 @@ class VisionChatNode(Node):
                 '没有检测到 ARK_API_KEY 或 DOUBAO_API_KEY 环境变量，视觉大模型请求可能失败。'
             )
 
+        self.declare_parameter('text_model', 'doubao-seed-2-0-pro-260215')
+        self.text_model = self.get_parameter('text_model').get_parameter_value().string_value
+
         self.bridge = CvBridge()
         self.latest_frame = None
         self.frame_lock = threading.Lock()
@@ -157,17 +160,16 @@ class VisionChatNode(Node):
 
             _, buffer = cv2.imencode('.jpg', frame)
             image_base64 = base64.b64encode(buffer).decode('utf-8')
+
+            
             prompt_text = (
-                #  '请结合下面的图像回答问题，输出格式必须是JSON格式：{"response": "你的回答"}。'
-                #  ' 回答以"我看到了"或"我观察到"开头，不要超过20个字，中文回复，幽默有趣。'
-                 ' 不要超过20个字，中文回复，幽默有趣，不要回复英文。'
+                #'不要超过20个字，中文回复，幽默有趣，不要回复英文。'
+                '请简洁回答用户问题，中文，只用短句，不啰嗦、不解释、不反问，幽默自然。直接给答案，禁止主动延伸、禁止多余情绪词、禁止长句。'
                 f' 用户的问题是："{question_text}"'
             )
             payload = {
                 'model': 'doubao-seed-2-0-pro-260215',
-                'thinking': {
-                    'type': 'disabled'  # 强制关闭深度思考，不输出推理过程
-                },
+                'tools': [{'type': 'web_search'}],
                 'input': [
                     {
                         'role': 'user',
@@ -179,13 +181,12 @@ class VisionChatNode(Node):
                             {
                                 'type': 'input_text',
                                 'text': prompt_text,
-                                #'max_tokens': 8000
                             },
                         ],
                     }
                 ],
             }
-
+           
             answer = self._call_vision_model(payload)
             if not answer:
                 answer = '抱歉，我暂时无法理解当前画面。'
@@ -313,7 +314,7 @@ class VisionChatNode(Node):
             with urllib.request.urlopen(req, timeout=60) as resp:
                 body = resp.read().decode('utf-8')
                 data = json.loads(body)
-                self.get_logger().debug(f'模型原始返回: {data}')
+                self.get_logger().info(f'模型原始返回: {data}')
                 return self._extract_text_from_response(data)
         except urllib.error.HTTPError as e:
             self.get_logger().error(f'视觉模型HTTP错误: {e.code} {e.reason}')
@@ -338,27 +339,67 @@ class VisionChatNode(Node):
             if isinstance(output, str):
                 raw_text = output.strip()
             elif isinstance(output, list) and output:
-                if isinstance(output[0], dict) and 'content' in output[0]:
-                    raw_text = str(output[0]['content']).strip()
-                else:
-                    raw_text = str(output[0]).strip()
+                for item in output:
+                    if isinstance(item, dict):
+                        if item.get('type') == 'message':
+                            content = item.get('content', [])
+                            if isinstance(content, list):
+                                for content_item in content:
+                                    if isinstance(content_item, dict) and content_item.get('type') == 'output_text':
+                                        raw_text = str(content_item.get('text', '')).strip()
+                                        break
+                                if raw_text:
+                                    break
+                            elif isinstance(content, str):
+                                raw_text = content.strip()
+                                break
+                        elif 'content' in item:
+                            content = item['content']
+                            if isinstance(content, str):
+                                raw_text = content.strip()
+                                break
+                            elif isinstance(content, list):
+                                raw_text = self._extract_content_list(content)
+                                break
+                        elif 'text' in item:
+                            raw_text = str(item['text']).strip()
+                            break
 
         if not raw_text and 'choices' in data and isinstance(data['choices'], list) and data['choices']:
             choice = data['choices'][0]
             if isinstance(choice, dict):
                 if 'message' in choice and isinstance(choice['message'], dict):
-                    raw_text = str(choice['message'].get('content', '')).strip()
+                    content = choice['message'].get('content', '')
+                    if isinstance(content, str):
+                        raw_text = content.strip()
+                    elif isinstance(content, list):
+                        raw_text = self._extract_content_list(content)
                 elif 'output_text' in choice:
                     raw_text = str(choice['output_text']).strip()
 
         if not raw_text and 'response' in data and isinstance(data['response'], str):
             raw_text = data['response'].strip()
 
+        if not raw_text:
+            raw_text = str(data)
+
         import re
-        raw_text = re.sub(r'[a-zA-Z\'\"_\-:;,.!?@#$%^&*(){}[\]|\\/<>`~+=]', '', raw_text)
+        raw_text = re.sub(r'[^\u4e00-\u9fa5，。！？、；：\d℃%~]', '', raw_text)
         raw_text = re.sub(r'\s+', '', raw_text).strip()
 
         return raw_text
+
+    def _extract_content_list(self, content_list):
+        result = []
+        for item in content_list:
+            if isinstance(item, dict):
+                if 'text' in item:
+                    result.append(str(item['text']))
+                elif 'content' in item:
+                    result.append(str(item['content']))
+            elif isinstance(item, str):
+                result.append(item)
+        return ''.join(result)
 
     def _publish_description(self, text: str):
         self.get_logger().info(f'发布视觉回答: {text}')
