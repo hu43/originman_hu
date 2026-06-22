@@ -170,6 +170,9 @@ class VisionChatNode(Node):
             payload = {
                 'model': 'doubao-seed-2-0-pro-260215',
                 'tools': [{'type': 'web_search'}],
+                # 'thinking': {
+                #     'type': 'disabled'  # 强制关闭深度思考，不输出推理过程
+                # },
                 'input': [
                     {
                         'role': 'user',
@@ -383,8 +386,8 @@ class VisionChatNode(Node):
         if not raw_text:
             raw_text = str(data)
 
-        import re
-        raw_text = re.sub(r'[^\u4e00-\u9fa5，。！？、；：\d℃%~]', '', raw_text)
+        import re  #使用正则表达式只保留中文字符和中文标点符号，过滤掉所有数字和其他无关字符
+        # raw_text = re.sub(r'[^\u4e00-\u9fa5，。！？、；：\d℃%~]', '', raw_text)
         raw_text = re.sub(r'\s+', '', raw_text).strip()
 
         return raw_text
