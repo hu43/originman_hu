@@ -164,15 +164,16 @@ class VisionChatNode(Node):
             
             prompt_text = (
                 #'不要超过20个字，中文回复，幽默有趣，不要回复英文。'
-                '请简洁回答用户问题，中文，只用短句，不啰嗦、不解释、不反问，幽默自然。直接给答案，禁止主动延伸、禁止多余情绪词、禁止长句。'
+                '请简洁回答用户问题，中文回复，只用短句，不要回复英文，不啰嗦、不解释、不反问，幽默自然。直接给答案，禁止主动延伸、禁止多余情绪词、禁止长句。'
                 f' 用户的问题是："{question_text}"'
+              
             )
             payload = {
                 'model': 'doubao-seed-2-0-pro-260215',
                 'tools': [{'type': 'web_search'}],
-                # 'thinking': {
-                #     'type': 'disabled'  # 强制关闭深度思考，不输出推理过程
-                # },
+                'thinking': {
+                    'type': 'disabled'  # 强制关闭深度思考，不输出推理过程
+                },
                 'input': [
                     {
                         'role': 'user',
