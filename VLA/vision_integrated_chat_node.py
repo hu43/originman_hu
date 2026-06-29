@@ -41,9 +41,7 @@ robot_order_template = '''
 佛山叶问的咏春拳：wing_chun()
 从前倾趴卧起立：stand_up_front()
 从后仰躺倒起立：stand_up_back()
-巡线跨栏模式：athletics()
-踢不同颜色的足球：kickball("red")
-搬运不同颜色的海绵方块：transport("red green blue")
+
 
 【输出限制】
 - 直接输出json即可，从{开始，以}结束，不要输出```json的开头或结尾
@@ -80,11 +78,11 @@ def stepping(): AGC.runActionGroup('stepping')
 def wing_chun(): AGC.runActionGroup('wing_chun')
 def stand_up_front(): AGC.runActionGroup('stand_up_front')
 def stand_up_back(): AGC.runActionGroup('stand_up_back')
-def athletics(): os.system('python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/athletics_perform_only.py')
-def kickball(color='red'): os.system(f'python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/KickBall_only_once.py {color}')
-def transport(color_list_str='red green blue'):
-    color_list = color_list_str.split(' ')
-    os.system(f'python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/Transport_only.py "{color_list}"')
+# def athletics(): os.system('python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/athletics_perform_only.py')
+# def kickball(color='red'): os.system(f'python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/KickBall_only_once.py {color}')
+# def transport(color_list_str='red green blue'):
+#     color_list = color_list_str.split(' ')
+#     os.system(f'python3 /userdata/dev_ws/src/originman/originman_hu/TonyPi-API-20241116_no_key/TonyPi/备份代码/Transport_only.py "{color_list}"')
 
 ACTION_FUNCS = {
     'stand': stand,
@@ -106,9 +104,9 @@ ACTION_FUNCS = {
     'wing_chun': wing_chun,
     'stand_up_front': stand_up_front,
     'stand_up_back': stand_up_back,
-    'athletics': athletics,
-    'kickball': kickball,
-    'transport': transport,
+    # 'athletics': athletics,
+    # 'kickball': kickball,
+    # 'transport': transport,
 }
 
 
@@ -121,9 +119,26 @@ class VisionIntegratedChat:
         self.frame_lock = threading.Lock()
         self.running = True
 
-        self.cap = cv2.VideoCapture(self.camera_index)
+        # 摄像头索引：优先环境变量，未设置则自动探测
+        camera_index_env = os.environ.get('VISION_CAMERA_INDEX')
+        if camera_index_env is not None:
+            self.camera_index = int(camera_index_env)
+        else:
+            print('未指定摄像头索引，正在自动探测可用摄像头...')
+            detected = self._auto_detect_camera_index()
+            if detected is None:
+                raise RuntimeError('未探测到任何可用摄像头，请检查硬件连接与驱动。')
+            self.camera_index = detected
+            print(f'自动探测到可用摄像头：索引 {self.camera_index}（/dev/video{self.camera_index}）')
+
+        # 强制使用 V4L2 后端打开，Linux 下兼容性最稳定
+        self.cap = cv2.VideoCapture(self.camera_index, cv2.CAP_V4L2)
         if not self.cap.isOpened():
-            raise RuntimeError(f'无法打开摄像头索引 {self.camera_index}，请检查摄像头连接。')
+            raise RuntimeError(f'无法打开摄像头索引 {self.camera_index}，请检查摄像头连接与权限。')
+
+        # 设置通用兼容分辨率，绝大多数USB摄像头都支持
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
 
         self.capture_thread = threading.Thread(target=self._camera_loop, daemon=True)
         self.capture_thread.start()
@@ -133,6 +148,15 @@ class VisionIntegratedChat:
         print('输入 exit 或 quit 退出程序。')
         if not self.api_key:
             print('警告：未检测到 ARK_API_KEY / DOUBAO_API_KEY，API 请求将失败。')
+
+    def _auto_detect_camera_index(self, max_index=5):
+        """自动探测第一个可用的摄像头索引，强制使用V4L2后端验证"""
+        for idx in range(max_index):
+            cap = cv2.VideoCapture(idx, cv2.CAP_V4L2)
+            if cap.isOpened():
+                cap.release()
+                return idx
+        return None
 
     def _camera_loop(self):
         while self.running:
@@ -424,3 +448,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
