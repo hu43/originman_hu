@@ -1,6 +1,6 @@
-# OriginMan VLA —— 超低配版视觉语言动作机器人
+<img width="268" height="352" alt="image" src="https://github.com/user-attachments/assets/c7b61b1a-3731-4fa8-abcd-0b0b22740e0b" /># OriginMan VLA —— 超低配版视觉语言动作机器人
 
-> 基于 OriginMan 硬件平台的多模态交互机器人，支持视觉理解、联网搜索、离线语音识别、动作执行与语音播报。
+> 基于 OriginMan 硬件平台的多模态大模型交互机器人，支持视觉理解、联网搜索、离线语音识别、动作执行与语音播报。
 
 ## 功能特性
 
@@ -35,6 +35,9 @@ originman_hu/
 ├── bin/                                 # 工具脚本
 └── README.md                            # 本文件
 ```
+
+<img width="357" height="816" alt="606161188-9090d9b1-6e2e-436e-a13a-55fe0013d1b4" src="https://github.com/user-attachments/assets/cf778dc5-01e2-4656-a065-6fe88d5291dd" />
+
 
 ## 环境要求
 
@@ -92,6 +95,10 @@ VISION_INPUT_MODE=hybrid python3 VLA/vision_integrated_chat_node.py
 | `VISION_CAMERA_INDEX` | 摄像头索引 | `0`（自动探测） |
 | `VISION_ASR_DEVICE` | 麦克风设备 | `hw:0,0` |
 | `AUDIO_DEVICE` | 音频播放设备 | `plughw:0,0` |
+
+### 4. 机器人连接wifi
+
+用ssh将自己的机器人连接到自己范围内的wifi Sudo NMCLI设备WiFi列表# 列出找到的wifi网络 sudo wifi_connect “WiFi用户名” “WiFi密码” # Linux连wifi
 
 ## 大模型配置
 
@@ -191,6 +198,9 @@ python3 web_robot_controller.py --host 0.0.0.0 --port 8000
 ## 参考资料
 
 - [OriginMan 官方教程](https://originman.guyuehome.com/zh/guide/quick_guide/)
+- [子豪兄TonyPi机器人交付 - 飞书云文档](https://my.feishu.cn/docx/Z0dkdyNpTojSXWx06zZcjTjXndg)
+- [Originman程序分享链接](https://vscode.dev/github/xiaobairisk/originman/blob/main/originman_kick_ball)
+- [py-xiaozhi](https://github.com/huangjunsen0406/py-xiaozhi/blob/main/README.zh.md)
 - [火山方舟文档](https://www.volcengine.com/docs/82379/)
 - [sherpa-onnx](https://github.com/k2-fsa/sherpa-onnx)
 - [edge-tts](https://github.com/rany2/edge-tts)
@@ -198,6 +208,8 @@ python3 web_robot_controller.py --host 0.0.0.0 --port 8000
 ## 联系
 
 如有问题，欢迎提 Issue 或联系：2533764649@qq.com
+有问题问AI，有问题问AI,可以把本github网址丢给ai让他帮你操作
+我的也是ai帮我写好的：）
 
 ---
 ## Release 资源
@@ -228,3 +240,10 @@ tar xzf sherpa-paraformer-zh-2023-09-14.tar.gz -C sherpa_models/
 ```
 
 *本项目由 AI 辅助开发，感谢 OriginMan 社区和各位开源贡献者。*
+
+
+### ai提示词内容
+
+1、<img width="268" height="352" alt="606159711-94dcd202-56cd-4e27-8bdf-f33a605cd4bd" src="https://github.com/user-attachments/assets/70cb9b74-d670-49c5-a9be-7b5c9bf209f5" />
+2，参考orginman_hu文件夹内的originman_vision和integrated_chat_node内的代码，另起一份新的python运行文件，要实现摄像头与大模型的功能整合。功能要求实现大模型视觉识别：视觉理解：机器人不仅仅是一个执行者，它还拥有一双“眼睛”，能够观察和理解周围的世界。 实现方式： 持续观察: 机器人通过摄像头以固定频率捕捉图像，并将其发布到 ROS 网络中，为系统提供实时的视觉输入。 图像与问题的结合: 当您提出一个关于视觉的问题，例如“你看到了什么？”，机器人会获取最新的摄像头图像，并将其与您的问题文本一起发送给多模态大模型。 生成描述性回答: 大模型能够理解图像内容和文本问题的关联，并生成一段详细的、人性化的描述性文字作为回答，例如“我看到了桌子上有一个红色的苹果...”等。
+所有任务行为只能在orginman_hu内进行，不能处理这个文件夹外的文件，并且要保证原orginman_hu内的所有功能能正常运行。
