@@ -30,6 +30,48 @@ import numpy as np
 import pyaudio
 import webrtcvad
 
+def _ensure_sherpa_model(model_dir=None):
+    """检查并自动下载 sherpa-onnx 中文语音识别模型（首次运行时）。
+    模型来源：hf-mirror.com（国内镜像），支持断点续传。"""
+    if model_dir is None:
+        model_dir = os.path.normpath(os.path.join(
+            os.path.dirname(os.path.abspath(__file__)), '..', 'sherpa_models', 'paraformer-zh'))
+    os.makedirs(model_dir, exist_ok=True)
+    model_path = os.path.join(model_dir, 'model.int8.onnx')
+    tokens_path = os.path.join(model_dir, 'tokens.txt')
+    base_url = 'https://hf-mirror.com/csukuangfj/sherpa-onnx-paraformer-zh-2023-09-14/resolve/main/'
+    ua = {'User-Agent': 'Mozilla/5.0 (X11; Linux aarch64) AppleWebKit/537.36'}
+
+    for filename, expected_mb in [('tokens.txt', 0.1), ('model.int8.onnx', 233)]:
+        fpath = os.path.join(model_dir, filename)
+        if os.path.isfile(fpath) and os.path.getsize(fpath) > 1000:
+            continue
+        print(f'[模型] 正在下载 {filename} ({expected_mb}MB)，请稍候...')
+        url = base_url + filename
+        tmp = fpath + '.tmp'
+        try:
+            req = urllib.request.Request(url, headers=ua)
+            with urllib.request.urlopen(req, timeout=120) as resp:
+                total = int(resp.headers.get('Content-Length', 0))
+                received = 0
+                chunk_size = 256 * 1024
+                with open(tmp, 'wb') as out:
+                    while True:
+                        chunk = resp.read(chunk_size)
+                        if not chunk:
+                            break
+                        out.write(chunk)
+                        received += len(chunk)
+                        if total > 0 and received % (2 * 1024 * 1024) < chunk_size:
+                            pct = received * 100 // total
+                            print(f'  {filename}: {pct}% ({received//1024//1024}/{total//1024//1024}MB)')
+            os.replace(tmp, fpath)
+            print(f'[模型] {filename} 下载完成。')
+        except Exception as e:
+            if os.path.exists(tmp):
+                os.remove(tmp)
+            raise RuntimeError(f'下载 {filename} 失败: {e}')
+
 robot_order_template = '''
 你是我的机器人助手，请根据摄像头画面和用户指令，生成机器人要执行的动作和一句简短中文回复。
 你只需要输出一个 JSON 对象，不要输出任何解释性文字、不要输出代码块标记、不要输出多余文本。
@@ -195,6 +237,8 @@ class SherpaASR:
             model_dir = os.path.normpath(os.path.join(_here, '..', 'sherpa_models', 'paraformer-zh'))
         model_onnx = os.path.join(model_dir, 'model.int8.onnx')
         tokens = os.path.join(model_dir, 'tokens.txt')
+        _ensure_sherpa_model(model_dir)
+
         if not os.path.isfile(model_onnx) or not os.path.isfile(tokens):
             raise RuntimeError(f'未找到 sherpa 模型文件：{model_onnx} / {tokens}')
 

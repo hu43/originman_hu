@@ -166,6 +166,13 @@ python3 web_robot_controller.py --host 0.0.0.0 --port 8000
 **Q: AI 额度用完怎么办？**
 > 模型会播报"我AI额度用光了，叫我主人给我充点钱，才能用我噢"。请前往火山方舟控制台充值或升级套餐。
 
+**Q: 首次启动时模型下载失败或太慢？**
+> 自动下载源是 hf-mirror.com（国内镜像）。如果下载失败：
+> 1. 检查网络连接
+> 2. 手动从 GitHub Releases 下载 `sherpa-paraformer-zh-2023-09-14.tar.gz`
+> 3. 解压到 `sherpa_models/paraformer-zh/` 目录
+> 4. 重新运行程序
+
 **Q: 语音播报没声音？**
 > 检查 ALSA 音频设备：`aplay -l` 列出设备，确认 `plughw:0,0` 正确。可用 `AUDIO_DEVICE` 环境变量覆盖。
 
@@ -193,4 +200,31 @@ python3 web_robot_controller.py --host 0.0.0.0 --port 8000
 如有问题，欢迎提 Issue 或联系：2533764649@qq.com
 
 ---
+## Release 资源
+
+本项目 GitHub Releases 提供以下资源：
+
+| 文件 | 说明 | 大小 |
+|------|------|------|
+| `originman_hu.tar.gz` | 完整代码包（不含模型） | ~65MB |
+| `sherpa-paraformer-zh-2023-09-14.tar.gz` | 语音识别模型（备用下载） | ~215MB |
+
+**Release 下载地址**：`https://github.com/hu43/originman_hu/releases`
+
+### 手动安装模型步骤
+
+```bash
+# 1. 下载代码
+git clone https://github.com/hu43/originman_hu.git
+cd originman_hu
+
+# 2. 下载模型（从 Release 页面或自动下载）
+# 方式 A：首次运行时自动下载（推荐）
+python3 VLA/vision_integrated_chat_node.py
+
+# 方式 B：从 Release 手动下载并解压
+wget https://github.com/hu43/originman_hu/releases/download/v1.0.0/sherpa-paraformer-zh-2023-09-14.tar.gz
+tar xzf sherpa-paraformer-zh-2023-09-14.tar.gz -C sherpa_models/
+```
+
 *本项目由 AI 辅助开发，感谢 OriginMan 社区和各位开源贡献者。*

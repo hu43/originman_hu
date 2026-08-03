@@ -17,3 +17,6 @@ temp_record.wav
 temp_raw.wav
 temp_denoised.wav
 test.wav
+
+# Sherpa-ONNX model (233MB, auto-downloaded on first run)
+sherpa_models/paraformer-zh/
