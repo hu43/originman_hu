@@ -1,4 +1,4 @@
-<img width="268" height="352" alt="image" src="https://github.com/user-attachments/assets/c7b61b1a-3731-4fa8-abcd-0b0b22740e0b" /># OriginMan VLA —— 超低配版视觉语言动作机器人
+# OriginMan VLA —— 超低配版视觉语言动作机器人
 
 > 基于 OriginMan 硬件平台的多模态大模型交互机器人，支持视觉理解、联网搜索、离线语音识别、动作执行与语音播报。
 
