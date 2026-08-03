@@ -245,7 +245,9 @@ tar xzf sherpa-paraformer-zh-2023-09-14.tar.gz -C sherpa_models/
 ### ai提示词内容
 
 1、<img width="268" height="352" alt="606159711-94dcd202-56cd-4e27-8bdf-f33a605cd4bd" src="https://github.com/user-attachments/assets/70cb9b74-d670-49c5-a9be-7b5c9bf209f5" />
+
 2、参考orginman_hu文件夹内的originman_vision和integrated_chat_node内的代码，另起一份新的python运行文件，要实现摄像头与大模型的功能整合。功能要求实现大模型视觉识别：视觉理解：机器人不仅仅是一个执行者，它还拥有一双“眼睛”，能够观察和理解周围的世界。 实现方式： 持续观察: 机器人通过摄像头以固定频率捕捉图像，并将其发布到 ROS 网络中，为系统提供实时的视觉输入。 图像与问题的结合: 当您提出一个关于视觉的问题，例如“你看到了什么？”，机器人会获取最新的摄像头图像，并将其与您的问题文本一起发送给多模态大模型。 生成描述性回答: 大模型能够理解图像内容和文本问题的关联，并生成一段详细的、人性化的描述性文字作为回答，例如“我看到了桌子上有一个红色的苹果...”等。
 所有任务行为只能在orginman_hu内进行，不能处理这个文件夹外的文件，并且要保证原orginman_hu内的所有功能能正常运行。
+
 3、在/userdata/dev_ws/src/originman/originman_hu/web文件夹内另起一份新的python运行文件，帮我实现用网页控制机器人的程序，要求：用户可以打开浏览器，在页面中输入对应网址后，通过点击网址内的对应动作按钮，实现对机器人基础动作功能的控制。
 所有任务行为只能在originman_hu/web文件夹内进行，不能处理这个文件夹外的文件，并且要保证原originman_hu内的所有功能能正常运行。
