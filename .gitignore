@@ -1,0 +1,19 @@
+# 环境变量（含 API Key）
+.env
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+
+# 临时文件
+*.tmp
+*.bak
+*.bak2
+
+# 音频临时文件
+temp_record.wav
+temp_raw.wav
+temp_denoised.wav
+test.wav

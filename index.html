@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>OriginMan 网页控制</title>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f3f6fb; margin: 0; padding: 24px; color: #233; }
+    .card { max-width: 760px; margin: 0 auto; background: white; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); }
+    h1 { margin-top: 0; }
+    .row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+    button { padding: 12px 10px; border: 0; border-radius: 10px; background: #2563eb; color: white; cursor: pointer; font-size: 15px; }
+    button:hover { background: #1d4ed8; }
+    .secondary { background: #64748b; }
+    .secondary:hover { background: #475569; }
+    .status { margin-top: 16px; padding: 12px; border-radius: 10px; background: #eef2ff; color: #3730a3; }
+    .small { font-size: 13px; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>OriginMan 网页控制面板</h1>
+    <p class="small">打开当前页面后，点击下方按钮即可向机器人发送基础动作指令。</p>
+    <div class="row">
+      <button data-action="stand">站立</button>
+      <button data-action="forward">前进</button>
+      <button data-action="back">后退</button>
+    </div>
+    <div class="row">
+      <button data-action="left">左移</button>
+      <button data-action="right">右移</button>
+      <button data-action="turn_left">左转</button>
+    </div>
+    <div class="row">
+      <button data-action="turn_right">右转</button>
+      <button data-action="wave">挥手</button>
+      <button data-action="bow">鞠躬</button>
+    </div>
+    <div class="row">
+      <button data-action="squat">下蹲</button>
+      <button data-action="kick_right">踢右脚</button>
+      <button data-action="kick_left">踢左脚</button>
+    </div>
+    <div class="row">
+      <button data-action="sit_ups">仰卧起坐</button>
+      <button data-action="stepping">踏步</button>
+      <button data-action="stand_up_front">前趴起立</button>
+    </div>
+    <div class="row">
+      <button data-action="stand_up_back">后躺起立</button>
+      <button class="secondary" onclick="location.reload()">刷新</button>
+      <button class="secondary" id="healthBtn">检测状态</button>
+    </div>
+    <div class="status" id="status">等待发送动作…</div>
+  </div>
+
+  <script>
+    const statusEl = document.getElementById('status');
+    const setStatus = (msg, ok = true) => {
+      statusEl.textContent = msg;
+      statusEl.style.background = ok ? '#eef2ff' : '#fee2e2';
+      statusEl.style.color = ok ? '#3730a3' : '#b91c1c';
+    };
+
+    async function sendAction(action) {
+      setStatus(`正在发送动作: ${action} ...`);
+      try {
+        const res = await fetch('/action', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action })
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setStatus(data.message || '动作已发送');
+        } else {
+          setStatus(data.message || '动作发送失败', false);
+        }
+      } catch (err) {
+        setStatus('请求失败，请确认服务已启动', false);
+      }
+    }
+
+    document.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => sendAction(btn.getAttribute('data-action')));
+    });
+
+    document.getElementById('healthBtn').addEventListener('click', async () => {
+      try {
+        const res = await fetch('/health');
+        const data = await res.json();
+        setStatus(data.status === 'ok' ? '服务运行正常' : '服务状态异常', data.status === 'ok');
+      } catch (err) {
+        setStatus('无法连接到控制服务', false);
+      }
+    });
+  </script>
+</body>
+</html>
