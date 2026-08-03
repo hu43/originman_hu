@@ -96,7 +96,7 @@ VISION_INPUT_MODE=hybrid python3 VLA/vision_integrated_chat_node.py
 | `VISION_ASR_DEVICE` | 麦克风设备 | `hw:0,0` |
 | `AUDIO_DEVICE` | 音频播放设备 | `plughw:0,0` |
 
-### 4. 机器人连接wifi
+### 5. 机器人连接wifi
 
 用ssh将自己的机器人连接到自己范围内的wifi Sudo NMCLI设备WiFi列表# 列出找到的wifi网络 sudo wifi_connect “WiFi用户名” “WiFi密码” # Linux连wifi
 
